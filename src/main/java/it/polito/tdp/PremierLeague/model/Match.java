@@ -29,6 +29,15 @@ public class Match {
 		this.date = date;
 	}
 	
+	
+	
+	public Match(Integer matchID) {
+		super();
+		this.matchID = matchID;
+	}
+
+
+
 	public Integer getMatchID() {
 		return matchID;
 	}

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import it.polito.tdp.PremierLeague.model.Action;
+import it.polito.tdp.PremierLeague.model.Collegamento;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
 
@@ -78,6 +79,69 @@ public class PremierLeagueDAO {
 				
 				
 				result.add(match);
+
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public ArrayList<Match> getAllMatchByMonth(int mese) {
+		String sql = "SELECT * " + 
+				"FROM matches m " + 
+				"WHERE Month(m.Date)=? ";
+		ArrayList<Match> result = new ArrayList<Match>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, mese);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				
+				Match match = new Match(res.getInt("m.MatchID"), res.getInt("m.TeamHomeID"), res.getInt("m.TeamAwayID"), res.getInt("m.teamHomeFormation"), 
+							res.getInt("m.teamAwayFormation"),res.getInt("m.resultOfTeamHome"), res.getTimestamp("m.date").toLocalDateTime(), null, null);
+				
+				
+				result.add(match);
+
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public ArrayList<Collegamento> getAllCollegamenti(int mese, int min) {
+		String sql = "SELECT m1.MatchID AS id1, m2.MatchID AS id2, COUNT(*) AS conto " + 
+				"FROM actions a1, actions a2, matches m1, matches m2 " + 
+				"WHERE MONTH(m1.Date)=? AND MONTH(m2.Date)=? AND m1.MatchID>m2.MatchID AND a1.MatchID=m1.MatchID AND a2.MatchID=m2.MatchID " + 
+				"AND a1.TimePlayed>=? AND a2.TimePlayed>=? AND a1.PlayerID=a2.PlayerID " + 
+				"group BY m1.MatchID, m2.MatchID "
+				+ "ORDER BY conto DESC ";
+		ArrayList<Collegamento> result = new ArrayList<Collegamento>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, mese);
+			st.setInt(2, mese);
+			st.setInt(3, min);
+			st.setInt(4, min);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				
+				Collegamento coll = new Collegamento(new Match(res.getInt("id1")), new Match(res.getInt("id2")),res.getInt("conto"));
+				result.add(coll);
 
 			}
 			conn.close();
