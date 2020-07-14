@@ -1,5 +1,7 @@
 package it.polito.tdp.PremierLeague.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,6 +29,7 @@ public class Model {
 	private ArrayList<Collegamento> collegamenti;
 
 	public void creaGrafo(int mese, int min) {
+		
 		grafo= new SimpleWeightedGraph<Match, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 		partite=dao.getAllMatchByMonth(mese);
 		Graphs.addAllVertices(grafo, partite);
@@ -34,6 +37,8 @@ public class Model {
 		for(Collegamento c:collegamenti) {
 			Graphs.addEdge(grafo, c.getM1(), c.getM2(), c.getPeso());
 		}
+		
+		//System.out.println(dao.getDate(LocalDateTime.of(2012, 5, 13,0,0,0)));
 		
 	}
 
@@ -52,7 +57,7 @@ public class Model {
 	int max;
 	ArrayList<Match> migliore;
 	Match arrivo;
-
+	
 	public void cercaCammino(Match m1, Match m2) {
 		LinkedList<Match> parziale=new LinkedList<Match>();
 		migliore=null;

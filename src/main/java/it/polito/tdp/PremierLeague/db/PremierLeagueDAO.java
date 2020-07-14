@@ -1,9 +1,13 @@
 package it.polito.tdp.PremierLeague.db;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import it.polito.tdp.PremierLeague.model.Action;
@@ -76,9 +80,6 @@ public class PremierLeagueDAO {
 				
 				Match match = new Match(res.getInt("m.MatchID"), res.getInt("m.TeamHomeID"), res.getInt("m.TeamAwayID"), res.getInt("m.teamHomeFormation"), 
 							res.getInt("m.teamAwayFormation"),res.getInt("m.resultOfTeamHome"), res.getTimestamp("m.date").toLocalDateTime(), res.getString("t1.Name"),res.getString("t2.Name"));
-				
-				
-				result.add(match);
 
 			}
 			conn.close();
@@ -142,6 +143,32 @@ public class PremierLeagueDAO {
 				
 				Collegamento coll = new Collegamento(new Match(res.getInt("id1")), new Match(res.getInt("id2")),res.getInt("conto"));
 				result.add(coll);
+
+			}
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public ArrayList<Integer> getDate(LocalDateTime localDateTime) {
+		String sql = "SELECT m.MatchID as partita " + 
+				"FROM matches m " + 
+				"WHERE DATE(m.Date)=? ";
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setTimestamp(1, Timestamp.valueOf(localDateTime));
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				
+				result.add(res.getInt("partita"));
 
 			}
 			conn.close();
